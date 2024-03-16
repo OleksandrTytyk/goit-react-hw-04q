@@ -1,17 +1,20 @@
-const ImageGallery = ({ photos }) => {
-  return (
-    <ul>
-      {photos !== null &&
-        photos.map((photo) => {
-          console.log(photo);
+import ImageCard from "../ImageCard/ImageCard";
+import css from "./ImageGallery.module.css";
 
-          return (
-            <li key={photo.id}>
-              <img src={photo.urls.small} alt={photo.alt_description} />
-            </li>
-          );
-        })}
-    </ul>
+const ImageGallery = ({ photos, openModal }) => {
+  return (
+    <div>
+      <ul className={css.gallery}>
+        {photos !== null &&
+          photos.map((photo) => {
+            return (
+              <li key={photo.id}>
+                <ImageCard photo={photo} openModal={openModal} />
+              </li>
+            );
+          })}
+      </ul>
+    </div>
   );
 };
 

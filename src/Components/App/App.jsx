@@ -1,40 +1,85 @@
 import { useEffect, useState } from "react";
 import SearchBar from "../SearchBar/SearchBar";
-import axios from "axios";
 import ImageGallery from "../ImageGallery/ImageGallery";
-// import css from "./App.module.css";
-const API_KEY = "YinxtRt2O16TNTNo1qbx7p0n0D5x1SYDWb9bNJHg6F0";
-// axios.defaults.baseURL = "https://api.unsplash.com/";
+import ImageModal from "../ImageModal/ImageModal";
+import Loader from "../Loader/Loader";
+import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
+import { requestPhoto } from "../services/api";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [photos, setPhotos] = useState(null);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  // const [showBtn, setShowBtn] = useState(false);
+
+  const openModal = (photo) => {
+    setSelectedPhoto(photo);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     async function fetchData() {
-      const { data } = await axios.get(
-        "https://api.unsplash.com/search/photos",
-        {
-          params: {
-            client_id: API_KEY,
-            query: searchQuery,
-            per_page: 20,
-          },
-        }
-      );
-      setPhotos(data.results);
+      try {
+        setIsLoading(true);
+
+        const data = await requestPhoto(searchQuery, page);
+        const newPhotos = data.results;
+
+        // setShowBtn(data.total_pages && data.total_pages !== page);
+
+        setPhotos((prevPhotos) =>
+          prevPhotos ? [...prevPhotos, ...newPhotos] : newPhotos
+        );
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchData();
-  }, [searchQuery]);
+  }, [searchQuery, page]);
+
+  const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
 
   const onSearchImgQuery = (query) => {
+    if (query !== searchQuery) {
+      // setShowBtn(false);
+
+      setPhotos([]);
+    }
+
     setSearchQuery(query);
   };
 
   return (
     <>
       <SearchBar onSearch={onSearchImgQuery} />
-      <ImageGallery photos={photos} />
+      {isLoading && <Loader />}
+      {photos !== null && photos.length > 0 && (
+        <ImageGallery photos={photos} openModal={openModal} />
+      )}
+      {photos !== null && photos.length > 0 && (
+        <LoadMoreBtn
+          onLoadMore={handleLoadMore}
+          hasMoreImages={photos && photos.length > 0}
+        />
+      )}
+      {selectedPhoto && (
+        <ImageModal
+          isOpen={modalIsOpen}
+          photo={selectedPhoto}
+          closeModal={closeModal}
+        />
+      )}
     </>
   );
 }

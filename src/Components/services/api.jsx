@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_KEY = "YinxtRt2O16TNTNo1qbx7p0n0D5x1SYDWb9bNJHg6F0";
-const PER_PAGE = 20;
+const PER_PAGE = 12;
 
 export const requestPhoto = async (searchQuery, page) => {
   const { data } = await axios.get("https://api.unsplash.com/search/photos", {

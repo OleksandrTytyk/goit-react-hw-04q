@@ -1,10 +1,8 @@
-const LoadMoreBtn = ({ onLoadMore, hasMoreImages }) => {
-  if (!hasMoreImages) {
-    return null;
-  }
+import css from "./LoadMoreBtn.module.css";
 
+const LoadMoreBtn = ({ onLoadMore }) => {
   return (
-    <button onClick={onLoadMore} style={{ marginTop: "20px" }}>
+    <button className={css.loadMoreBtn} type="button" onClick={onLoadMore}>
       Load more
     </button>
   );

@@ -5,6 +5,8 @@ import ImageModal from "../ImageModal/ImageModal";
 import Loader from "../Loader/Loader";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 import { requestPhoto } from "../services/api";
+import toast, { Toaster } from "react-hot-toast";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,7 +15,8 @@ function App() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  // const [showBtn, setShowBtn] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [showLoadMoreBtn, setshowLoadMoreBtn] = useState(false);
 
   const openModal = (photo) => {
     setSelectedPhoto(photo);
@@ -27,18 +30,26 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       try {
+        if (!searchQuery) return;
+
         setIsLoading(true);
+        setIsError(false);
+        setshowLoadMoreBtn(false);
 
         const data = await requestPhoto(searchQuery, page);
         const newPhotos = data.results;
 
-        // setShowBtn(data.total_pages && data.total_pages !== page);
+        if (newPhotos.length === 0) {
+          return toast.error("Enter a correct query");
+        }
+
+        setshowLoadMoreBtn(data.total_pages > page);
 
         setPhotos((prevPhotos) =>
           prevPhotos ? [...prevPhotos, ...newPhotos] : newPhotos
         );
       } catch (error) {
-        console.log(error);
+        setIsError(true);
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +63,7 @@ function App() {
 
   const onSearchImgQuery = (query) => {
     if (query !== searchQuery) {
-      // setShowBtn(false);
+      setshowLoadMoreBtn(false);
 
       setPhotos([]);
     }
@@ -67,12 +78,8 @@ function App() {
       {photos !== null && photos.length > 0 && (
         <ImageGallery photos={photos} openModal={openModal} />
       )}
-      {photos !== null && photos.length > 0 && (
-        <LoadMoreBtn
-          onLoadMore={handleLoadMore}
-          hasMoreImages={photos && photos.length > 0}
-        />
-      )}
+      {showLoadMoreBtn && <LoadMoreBtn onLoadMore={handleLoadMore} />}
+      {isError && <ErrorMessage />}
       {selectedPhoto && (
         <ImageModal
           isOpen={modalIsOpen}
@@ -80,6 +87,7 @@ function App() {
           closeModal={closeModal}
         />
       )}
+      <Toaster position="down-center" />
     </>
   );
 }

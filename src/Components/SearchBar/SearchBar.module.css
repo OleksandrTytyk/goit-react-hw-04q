@@ -1,0 +1,39 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0004ff;
+}
+
+.searchForm {
+  position: relative;
+  padding: 5px 15px;
+}
+
+.searchInput {
+  padding: 8px 8px;
+  border: none;
+  outline: none;
+  min-width: 320px;
+  font-size: 16px;
+}
+
+.searchBtn {
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+
+  top: 10%;
+  left: 86%;
+  border: none;
+  padding: 8px 12px;
+  height: 35px;
+
+  background-color: white;
+}
+
+.searchBtn:hover,
+.searchBtn:focus {
+  color: #0004ff;
+}
